@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common.h"
+#include "FormulaAST.h"
 
 #include <memory>
 #include <vector>
@@ -12,19 +13,20 @@
 // Ячейки, указанные в формуле, могут быть как формулами, так и текстом. Если это
 // текст, но он представляет число, тогда его нужно трактовать как число. Пустая
 // ячейка или ячейка с пустым текстом трактуется как число ноль.
-class FormulaInterface {
+class FormulaInterface
+{
 public:
     using Value = std::variant<double, FormulaError>;
 
     virtual ~FormulaInterface() = default;
 
-    // Обратите внимание, что в метод Evaluate() ссылка на таблицу передаётся 
+    // Обратите внимание, что в метод Evaluate() ссылка на таблицу передаётся
     // в качестве аргумента.
     // Возвращает вычисленное значение формулы для переданного листа либо ошибку.
     // Если вычисление какой-то из указанных в формуле ячеек приводит к ошибке, то
     // возвращается именно эта ошибка. Если таких ошибок несколько, возвращается
     // любая.
-    virtual Value Evaluate(const SheetInterface& sheet) const = 0;
+    virtual Value Evaluate(const SheetInterface &sheet) const = 0;
 
     // Возвращает выражение, которое описывает формулу.
     // Не содержит пробелов и лишних скобок.
@@ -39,3 +41,17 @@ public:
 // Парсит переданное выражение и возвращает объект формулы.
 // Бросает FormulaException в случае, если формула синтаксически некорректна.
 std::unique_ptr<FormulaInterface> ParseFormula(std::string expression);
+
+class Formula : public FormulaInterface
+{
+public:
+    // Реализуйте следующие методы:
+    explicit Formula(std::string expression);
+
+    Value Evaluate(const SheetInterface &sheet) const override;
+    std::string GetExpression() const override;
+    std::vector<Position> GetReferencedCells() const override;
+
+private:
+    FormulaAST ast_;
+};
