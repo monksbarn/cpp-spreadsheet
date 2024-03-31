@@ -93,6 +93,7 @@ void Cell::Clear() {
         ResetCash();
         linked_cells_.affect_cells.clear();
         linked_cells_.dependent_cells.clear();
+        sheet_ = nullptr;
     }
 }
 

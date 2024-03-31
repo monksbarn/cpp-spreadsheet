@@ -7,6 +7,8 @@
 #include "common.h"
 #include "formula.h"
 
+bool HasCyrcle(const Position &pos, const Position &searching, const SheetInterface *sheet);
+
 bool HasFormula(const std::string &text);
 
 struct LinkedCells {

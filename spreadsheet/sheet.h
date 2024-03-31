@@ -2,17 +2,22 @@
 
 #include <functional>
 #include <memory>
+#include <unordered_map>
 #include <vector>
 
 #include "cell.h"
 #include "common.h"
 
+struct Hasher {
+    size_t operator()(const Position &pos) const {
+        return (pos.col < pos.row) ? pos.row : pos.col + pos.MAX_COLS;
+    }
+};
+
 class Sheet : public SheetInterface {
    public:
     Sheet() = default;
     ~Sheet() = default;
-
-    // void SetCell(const Position &pos);
 
     void SetCell(Position pos, std::string text) override;
 
@@ -26,9 +31,7 @@ class Sheet : public SheetInterface {
     void PrintValues(std::ostream &output) const override;
     void PrintTexts(std::ostream &output) const override;
 
-    // Можете дополнить ваш класс нужными полями и методами
-
    private:
     Size size_;
-    std::vector<std::vector<std::unique_ptr<Cell>>> sheet_;
+    std::unordered_map<Position, std::unique_ptr<Cell>, Hasher> sheet_;
 };
